@@ -1,0 +1,11 @@
+NAME: Nathan Smith
+EMAIL: nathan.smith@ucla.edu
+ID: 704787554
+
+Files:
+- lab4c_tcp.c:
+- lab4c_tls: 
+- Makefile: a Makefile with the commands defined by the spec.
+- README: This README!
+
+Notes:
