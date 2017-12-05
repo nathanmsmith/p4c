@@ -171,11 +171,11 @@ int main(int argc, char** argv)
         break;
       case 'i': // Id
         id = optarg;
-        printf("ID: %s", id);
+        printf("ID: %s\n", id);
         break;
       case 'h': // Host
         hostname = optarg;
-        printf("Host: %s", hostname);
+        printf("Host: %s\n", hostname);
         break;
       default:
         fprintf(stderr, "[Error] Unsupported argument.\n");
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
     } else {
       // Non-switch parameter, port number
       portNumber = argv[optind];
-      printf("Port Number: %s", hostname);
+      printf("Port Number: %s\n", hostname);
       optind++;
     }
   }
