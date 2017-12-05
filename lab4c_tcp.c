@@ -15,6 +15,7 @@ ID: 704787554
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -26,6 +27,27 @@ char scale = 'F';
 FILE* logFile;
 bool paused = false;
 int run_flag = 1;
+
+/** System Calls **/
+int socketAndCheck(int socket_family, int socket_type, int protocol)
+{
+  int status = socket(socket_family, socket_type, protocol);
+  if (status == -1) {
+    fprintf(stderr, "[Socket Error] Error Number: %d Message: %s\n", errno, strerror(errno));
+    exit(EXIT_CODE_ERROR);
+  }
+  return status;
+}
+
+int connectAndCheck(int sockfd, const struct sockaddr* addr, socklen_t addrlen)
+{
+  int status = connect(sockfd, addr, addrlen);
+  if (status == -1) {
+    fprintf(stderr, "[Connect Error] Error Number: %d Message: %s\n", errno, strerror(errno));
+    exit(EXIT_CODE_ERROR);
+  }
+  return status;
+}
 
 int pollAndCheck(struct pollfd* fds, nfds_t nfds, int timeout)
 {
@@ -199,36 +221,50 @@ int main(int argc, char** argv)
   mraa_gpio_dir(button, MRAA_GPIO_IN);
   mraa_gpio_isr(button, MRAA_GPIO_EDGE_RISING, &shutdown, NULL);
 
-  struct pollfd pollArr[1];
-  pollArr[0].fd = STDIN_FILENO;
-  pollArr[0].events = POLLIN | POLLHUP | POLLERR;
+  // Establish connection
+  struct sockaddr_in serverAddress;
+  struct hostent* server = gethostbyname("lever.cs.ucla.edu");
+  int socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
 
-  while (run_flag) {
-    if (!paused) {
-      int rawTemp = mraa_aio_read(tempSensor);
+  bzero((char*)&serverAddress, sizeof(serverAddress));
+  serverAddress.sin_family = AF_INET;
+  bcopy((char*)server->h_addr, (char*)&serverAddress.sin_addr.s_addr, server->h_length);
+  serverAddress.sin_port = htons(portNumber);
 
-      double convertedTemp = convertTemperature(rawTemp, scale);
-      char timeString[10];
-      getCurrentTime(timeString);
+  connectAndCheck(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
-      printf("%s %.1f\n", timeString, convertedTemp);
-      if (logFile) {
-        fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
-        fflush(logFile);
-      }
-    }
+  dprintf(sockfd, "ID=%d\n", id);
 
-    pollAndCheck(pollArr, 1, 0);
-    if ((pollArr[0].revents & POLLIN)) {
-      char input[100];
-      scanf("%s", input);
-      processCommand(input);
-    }
+  // struct pollfd pollArr[1];
+  // pollArr[0].fd = STDIN_FILENO;
+  // pollArr[0].events = POLLIN | POLLHUP | POLLERR;
 
-    if (!paused) {
-      usleep(samplingInterval * 1000000);
-    }
-  }
+  // while (run_flag) {
+  //   if (!paused) {
+  //     int rawTemp = mraa_aio_read(tempSensor);
+
+  //     double convertedTemp = convertTemperature(rawTemp, scale);
+  //     char timeString[10];
+  //     getCurrentTime(timeString);
+
+  //     printf("%s %.1f\n", timeString, convertedTemp);
+  //     if (logFile) {
+  //       fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
+  //       fflush(logFile);
+  //     }
+  //   }
+
+  //   pollAndCheck(pollArr, 1, 0);
+  //   if ((pollArr[0].revents & POLLIN)) {
+  //     char input[100];
+  //     scanf("%s", input);
+  //     processCommand(input);
+  //   }
+
+  //   if (!paused) {
+  //     usleep(samplingInterval * 1000000);
+  //   }
+  // }
 
   mraa_aio_close(tempSensor);
   mraa_gpio_close(button);
