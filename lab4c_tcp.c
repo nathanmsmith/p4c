@@ -146,11 +146,12 @@ int main(int argc, char** argv)
     { "log", required_argument, 0, 'l' },
     { "id", required_argument, 0, 'i' },
     { "host", required_argument, 0, 'h' },
-    {}
+    { 0, 0, 0, 0 }
   };
 
   char* id;
   char* hostname;
+  char* portNumber;
 
   while (optind < argc) {
     int option;
@@ -174,7 +175,7 @@ int main(int argc, char** argv)
         break;
       case 'h': // Host
         hostname = optarg;
-        printf("ID: %s", hostname);
+        printf("Host: %s", hostname);
         break;
       default:
         fprintf(stderr, "[Error] Unsupported argument.\n");
@@ -182,6 +183,9 @@ int main(int argc, char** argv)
       }
     } else {
       // Non-switch parameter, port number
+      portNumber = argv[optind];
+      printf("Port Number: %s", hostname);
+      optind++;
     }
   }
 
