@@ -251,6 +251,7 @@ int main(int argc, char** argv)
 
   // Establish connection
   struct sockaddr_in serverAddress;
+  printf("Hostname: %s\n", hostname);
   struct hostent* server = gethostbyname(hostname);
   if (server == NULL) {
     printf("told ya so\n");
