@@ -22,6 +22,10 @@ ID: 704787554
 #include <time.h>
 #include <unistd.h>
 
+#define SUCCESS 0
+#define INVALID_ARGUMENT 1
+#define OTHER_FAILURE 2
+
 const int B = 4275; // B value of the thermistor
 const int R0 = 100000; // R0 = 100k
 
@@ -38,8 +42,11 @@ int run_flag = 1;
 
 int socketFileDescriptor;
 
+SSL* sslStructure;
+
 /** System Calls **/
-ssize_t readAndCheck(int fd, void* buf, size_t count)
+ssize_t
+readAndCheck(int fd, void* buf, size_t count)
 {
   ssize_t status = read(fd, buf, count);
   if (status == -1) {
@@ -254,7 +261,7 @@ int main(int argc, char** argv)
   OpenSSL_add_all_algorithms();
   const SSL_METHOD* method = TLSv1_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
-  SSL* sslStructure = SSL_new(sslContext);
+  sslStructure = SSL_new(sslContext);
   if (SSL_set_fd(sslStructure, socketFileDescriptor) < 0) {
     exit(OTHER_FAILURE);
   }
