@@ -235,7 +235,8 @@ int main(int argc, char** argv)
     }
   }
 
-  for (int index = optind; index < argc; index++) {
+  int index;
+  for (index = optind; index < argc; index++) {
     printf("Non-option argument: %s\n", argv[index]);
   }
 
