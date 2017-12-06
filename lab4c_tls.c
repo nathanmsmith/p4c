@@ -146,18 +146,26 @@ int main(int argc, char** argv)
   // Set up TLS Session
   SSL_library_init();
   OpenSSL_add_all_algorithms();
-  SSL_METHOD* method = TLSv1_2_client_method();
+  const SSL_METHOD* method = TLSv1_2_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
-  SSL_new(sslContext);
+  if (SSL_new(sslContext) < 0) {
+    exit(2);
+  }
   SSL* sslStructure = SSL_new(sslContext);
-  SSL_set_fd(sslStructure, socketFileDescriptor);
-  SSL_connect(sslStructure);
+  if (SSL_set_fd(sslStructure, socketFileDescriptor) < 0) {
+    exit(2);
+  }
+  if (SSL_connect(sslStructure) < 0) {
+    exit(2);
+  }
 
   printf("Set up TLS.\n");
 
   char idString[20];
   sprintf(idString, "ID=%d\n", id);
-  SSL_write(sslStructure, idString, strlen(idString));
+  if (SSL_write(sslStructure, idString, strlen(idString)) < 0) {
+    exit(2);
+  }
 
   printf("Wrote ID!\n");
 
