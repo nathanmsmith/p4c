@@ -146,7 +146,7 @@ int main(int argc, char** argv)
   // Set up TLS Session
   SSL_library_init();
   OpenSSL_add_all_algorithms();
-  const SSL_METHOD* method = TLSv1_1_client_method();
+  const SSL_METHOD* method = TLSv1_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
   SSL* sslStructure = SSL_new(sslContext);
   if (SSL_set_fd(sslStructure, socketFileDescriptor) < 0) {
