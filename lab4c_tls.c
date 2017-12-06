@@ -183,7 +183,7 @@ void processCommand(char* input)
 
 void writeToServerOverSSL(char* str)
 {
-  if (SSL_write(sslStructure, idString, strlen(idString)) < 0) {
+  if (SSL_write(sslStructure, str, strlen(str)) < 0) {
     exit(OTHER_FAILURE);
   }
 }
