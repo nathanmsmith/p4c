@@ -276,6 +276,15 @@ int main(int argc, char** argv)
       char input[100];
       int bytesRead = readAndCheck(socketFileDescriptor, input, 100);
       printf("%s", input);
+      for (int i = 0; i < bytesRead; i++) {
+        // Commands end with a newline
+        if (input[i] == '\n') {
+          input[i] = '\0';
+          processCommand(input);
+          input = input[i] + 1;
+        }
+      }
+
       // processCommand(input);
     }
 
