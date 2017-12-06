@@ -278,12 +278,13 @@ int main(int argc, char** argv)
       printf("%s", input);
 
       int i;
+      int start = 0;
       for (i = 0; i < bytesRead; i++) {
         // Commands end with a newline
         if (input[i] == '\n') {
           input[i] = '\0';
-          processCommand(input);
-          input = input + i + 1;
+          processCommand(input + start);
+          start = i + 1;
         }
       }
 
