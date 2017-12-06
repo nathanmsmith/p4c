@@ -158,6 +158,13 @@ void changePeriod(char* newPeriod)
   }
 }
 
+void logLine(char* line)
+{
+  if (logFile) {
+    fprintf(logFile, line);
+  }
+}
+
 void processCommand(char* input)
 {
   if (strcmp(input, "STOP") == 0) {
@@ -176,6 +183,8 @@ void processCommand(char* input)
     changeScale('C');
   } else if (strncmp(input, "PERIOD=", 7) == 0) {
     changePeriod(input + 7 * sizeof(char));
+  } else if (strncmp(input, "LOG ", 4) == 0) {
+    logLine(input);
   }
 }
 
