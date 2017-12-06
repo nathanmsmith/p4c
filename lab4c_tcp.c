@@ -246,8 +246,12 @@ int main(int argc, char** argv)
   // Since --id, --host, --log, and port number are mandatory
   if (id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0) {
     fprintf(stderr, "Argument error\n");
-    fprintf(stderr, "%i", logFile == NULL);
-    fprintf(stderr, "ID: %i\nhostname: %s, portNumber: %i", id, hostname, portNumber);
+    fprintf(stderr, "%i\n", id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0);
+    fprintf(stderr, "%i\n", id <= 0);
+    fprintf(stderr, "%i\n", strcmp(hostname, ""));
+    fprintf(stderr, "%i\n", logFile == NULL);
+    fprintf(stderr, "%i\n", portNumber == 0);
+    fprintf(stderr, "ID: %i\nhostname: %s\nportNumber: %i\n", id, hostname, portNumber);
     exit(INVALID_ARGUMENT);
   }
 
