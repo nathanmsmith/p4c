@@ -209,37 +209,33 @@ int main(int argc, char** argv)
     { 0, 0, 0, 0 }
   };
 
-  while (optind < argc) {
-    int option;
-    if ((option = getopt_long(argc, argv, "", options, 0)) != -1) {
-      switch (option) {
-      case 'p': // Period
-        samplingInterval = atoi(optarg);
-        break;
-      case 's': // Scale
-        if (strcmp(optarg, "F") != 0 && strcmp(optarg, "C") != 0) {
-          exit(INVALID_ARGUMENT);
-        }
-        scale = optarg[0];
-        break;
-      case 'l': // Log
-        logFile = fopen(optarg, "w");
-        break;
-      case 'i': // Id
-        id = atoi(optarg);
-        break;
-      case 'h': // Host
-        hostname = optarg;
-        break;
-      default:
+  while ((option = getopt_long(argc, argv, "", options, 0)) != -1) {
+    switch (option) {
+    case 'p': // Period
+      samplingInterval = atoi(optarg);
+      break;
+    case 's': // Scale
+      if (strcmp(optarg, "F") != 0 && strcmp(optarg, "C") != 0) {
         exit(INVALID_ARGUMENT);
       }
-    } else {
-      // Non-switch parameter, port number
-      portNumber = atoi(argv[optind]);
-      printf("Port Number: %d\n", portNumber);
-      optind++;
+      scale = optarg[0];
+      break;
+    case 'l': // Log
+      logFile = fopen(optarg, "w");
+      break;
+    case 'i': // Id
+      id = atoi(optarg);
+      break;
+    case 'h': // Host
+      hostname = optarg;
+      break;
+    default:
+      exit(INVALID_ARGUMENT);
     }
+  }
+
+  for (index = optind; index < argc; index++) {
+    printf("Non-option argument: %s\n", argv[index])
   }
 
   // Since --id, --host, --log, and port number are mandatory
