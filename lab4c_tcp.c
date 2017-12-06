@@ -244,7 +244,7 @@ int main(int argc, char** argv)
   }
 
   // Since --id, --host, --log, and port number are mandatory
-  if (id <= 0 || strcmp(hostname, "") != 0 || logFile == NULL || portNumber == 0) {
+  if (id <= 0 || strcmp(hostname, "") == 0 || logFile == NULL || portNumber == 0) {
     fprintf(stderr, "Argument error\n");
     fprintf(stderr, "%i\n", id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0);
     fprintf(stderr, "%i\n", id <= 0);
