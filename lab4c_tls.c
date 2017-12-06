@@ -149,13 +149,16 @@ int main(int argc, char** argv)
   const SSL_METHOD* method = TLSv1_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
   if (SSL_new(sslContext) < 0) {
+    printf("new.\n");
     exit(2);
   }
   SSL* sslStructure = SSL_new(sslContext);
   if (SSL_set_fd(sslStructure, socketFileDescriptor) < 0) {
+    printf("set fd\n");
     exit(2);
   }
   if (SSL_connect(sslStructure) < 0) {
+    printf("connect.\n");
     exit(2);
   }
 
