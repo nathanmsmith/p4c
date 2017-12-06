@@ -235,10 +235,7 @@ int main(int argc, char** argv)
     }
   }
 
-  int index;
-  for (index = optind; index < argc; index++) {
-    printf("Non-option argument: %s\n", argv[index]);
-  }
+  portNumber = argv[optind];
 
   // Since --id, --host, --log, and port number are mandatory
   if (id == -1 || strcmp(hostname, "") || logFile == NULL || portNumber == -1) {
