@@ -127,7 +127,7 @@ int main(int argc, char** argv)
   }
 
   // // Initialize Temperature Sensor
-  mraa_aio_context tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
+  // mraa_aio_context tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
 
   // Establish connection
   struct sockaddr_in serverAddress;
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
   // Set up TLS Session
   SSL_library_init();
   OpenSSL_add_all_algorithms();
-  SSL_CTX* sslContext = SSL_CTX_new(TLS_method());
+  SSL_CTX* sslContext = SSL_CTX_new(TLS_client_method());
   SSL_new(sslContext);
   SSL* sslStructure = SSL_new(sslContext);
   SSL_set_fd(sslStructure, socketFileDescriptor);
