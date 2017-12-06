@@ -7,7 +7,7 @@ ID: 704787554
 #include <errno.h>
 #include <getopt.h>
 #include <math.h>
-// #include <mraa/aio.h>
+#include <mraa/aio.h>
 // #include <mraa/gpio.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -215,8 +215,8 @@ int main(int argc, char** argv)
   }
 
   // // Initialize Temperature Sensor
-  // mraa_aio_context tempSensor;
-  // tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
+  mraa_aio_context tempSensor;
+  tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
 
   // // Initialize button
   // mraa_gpio_context button;
@@ -240,38 +240,38 @@ int main(int argc, char** argv)
 
   dprintf(socketFileDescriptor, "ID=%d\n", id);
 
-  // struct pollfd pollArr[1];
-  // pollArr[0].fd = STDIN_FILENO;
-  // pollArr[0].events = POLLIN | POLLHUP | POLLERR;
+  struct pollfd pollArr[1];
+  pollArr[0].fd = STDIN_FILENO;
+  pollArr[0].events = POLLIN | POLLHUP | POLLERR;
 
-  // while (run_flag) {
-  //   if (!paused) {
-  //     int rawTemp = mraa_aio_read(tempSensor);
+  while (run_flag) {
+    if (!paused) {
+      int rawTemp = mraa_aio_read(tempSensor);
 
-  //     double convertedTemp = convertTemperature(rawTemp, scale);
-  //     char timeString[10];
-  //     getCurrentTime(timeString);
+      double convertedTemp = convertTemperature(rawTemp, scale);
+      char timeString[10];
+      getCurrentTime(timeString);
 
-  //     printf("%s %.1f\n", timeString, convertedTemp);
-  //     if (logFile) {
-  //       fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
-  //       fflush(logFile);
-  //     }
-  //   }
+      printf("%s %.1f\n", timeString, convertedTemp);
+      if (logFile) {
+        fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
+        fflush(logFile);
+      }
+    }
 
-  //   pollAndCheck(pollArr, 1, 0);
-  //   if ((pollArr[0].revents & POLLIN)) {
-  //     char input[100];
-  //     scanf("%s", input);
-  //     processCommand(input);
-  //   }
+    pollAndCheck(pollArr, 1, 0);
+    if ((pollArr[0].revents & POLLIN)) {
+      char input[100];
+      scanf("%s", input);
+      processCommand(input);
+    }
 
-  //   if (!paused) {
-  //     usleep(samplingInterval * 1000000);
-  //   }
-  // }
+    if (!paused) {
+      usleep(samplingInterval * 1000000);
+    }
+  }
 
-  // mraa_aio_close(tempSensor);
+  mraa_aio_close(tempSensor);
   // mraa_gpio_close(button);
   exit(0);
 }
