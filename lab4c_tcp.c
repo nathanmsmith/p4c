@@ -240,10 +240,12 @@ int main(int argc, char** argv)
 
   if (optind != argc) {
     portNumber = atoi(argv[optind]);
+    printf("port num %i\n", portNumber)
   }
 
   // Since --id, --host, --log, and port number are mandatory
   if (id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0) {
+    fprintf(stderr, "Argument error\n");
     exit(INVALID_ARGUMENT);
   }
 
