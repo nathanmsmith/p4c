@@ -7,8 +7,10 @@ ID: 704787554
 #include <errno.h>
 #include <getopt.h>
 #include <math.h>
-#include <mraa/aio.h>
-#include <mraa/gpio.h>
+// #include <mraa/aio.h>
+// #include <mraa/gpio.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -16,6 +18,7 @@ ID: 704787554
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -34,7 +37,7 @@ int socketAndCheck(int socket_family, int socket_type, int protocol)
   int status = socket(socket_family, socket_type, protocol);
   if (status == -1) {
     fprintf(stderr, "[Socket Error] Error Number: %d Message: %s\n", errno, strerror(errno));
-    exit(EXIT_CODE_ERROR);
+    exit(2);
   }
   return status;
 }
@@ -44,7 +47,7 @@ int connectAndCheck(int sockfd, const struct sockaddr* addr, socklen_t addrlen)
   int status = connect(sockfd, addr, addrlen);
   if (status == -1) {
     fprintf(stderr, "[Connect Error] Error Number: %d Message: %s\n", errno, strerror(errno));
-    exit(EXIT_CODE_ERROR);
+    exit(2);
   }
   return status;
 }
@@ -54,7 +57,7 @@ int pollAndCheck(struct pollfd* fds, nfds_t nfds, int timeout)
   int status = poll(fds, nfds, timeout);
   if (status == -1) {
     fprintf(stderr, "[Poll Error] Error Number: %d\nMessage: %s\n", errno, strerror(errno));
-    exit(1);
+    exit(2);
   }
   return status;
 }
@@ -81,21 +84,21 @@ double convertTemperature(int rawTemp, char scale)
   return farenheit;
 }
 
-void start()
+void startProgram()
 {
   fprintf(logFile, "START\n");
   fflush(logFile);
   paused = false;
 }
 
-void stop()
+void stopProgram()
 {
   fprintf(logFile, "STOP\n");
   fflush(logFile);
   paused = true;
 }
 
-void shutdown()
+void shutdownProgram()
 {
   char timeString[10];
   getCurrentTime(timeString);
@@ -142,15 +145,15 @@ void changePeriod(char* newPeriod)
 void processCommand(char* input)
 {
   if (strcmp(input, "STOP") == 0) {
-    stop();
+    stopProgram();
   } else if (strcmp(input, "START") == 0) {
-    start();
+    startProgram();
   } else if (strcmp(input, "OFF") == 0) {
     if (logFile) {
       fprintf(logFile, "OFF\n");
       fflush(logFile);
     }
-    shutdown();
+    shutdownProgram();
   } else if (strcmp(input, "SCALE=F") == 0) {
     changeScale('F');
   } else if (strcmp(input, "SCALE=C") == 0) {
@@ -171,9 +174,9 @@ int main(int argc, char** argv)
     { 0, 0, 0, 0 }
   };
 
-  char* id;
-  char* hostname;
-  char* portNumber;
+  int id;
+  char* hostname = "lever.cs.ucla.edu";
+  int portNumber;
 
   while (optind < argc) {
     int option;
@@ -192,8 +195,8 @@ int main(int argc, char** argv)
         logFile = fopen(optarg, "w");
         break;
       case 'i': // Id
-        id = optarg;
-        printf("ID: %s\n", id);
+        id = atoi(optarg);
+        printf("ID: %d\n", id);
         break;
       case 'h': // Host
         hostname = optarg;
@@ -205,25 +208,25 @@ int main(int argc, char** argv)
       }
     } else {
       // Non-switch parameter, port number
-      portNumber = argv[optind];
-      printf("Port Number: %s\n", hostname);
+      portNumber = atoi(argv[optind]);
+      printf("Port Number: %d\n", portNumber);
       optind++;
     }
   }
 
-  // Initialize Temperature Sensor
-  mraa_aio_context tempSensor;
-  tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
+  // // Initialize Temperature Sensor
+  // mraa_aio_context tempSensor;
+  // tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
 
-  // Initialize button
-  mraa_gpio_context button;
-  button = mraa_gpio_init(60); // Spec calls for D3 pin, unsure of where that is so this may change
-  mraa_gpio_dir(button, MRAA_GPIO_IN);
-  mraa_gpio_isr(button, MRAA_GPIO_EDGE_RISING, &shutdown, NULL);
+  // // Initialize button
+  // mraa_gpio_context button;
+  // button = mraa_gpio_init(60); // Spec calls for D3 pin, unsure of where that is so this may change
+  // mraa_gpio_dir(button, MRAA_GPIO_IN);
+  // mraa_gpio_isr(button, MRAA_GPIO_EDGE_RISING, &shutdownProgram, NULL);
 
   // Establish connection
   struct sockaddr_in serverAddress;
-  struct hostent* server = gethostbyname("lever.cs.ucla.edu");
+  struct hostent* server = gethostbyname(hostname);
   int socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
 
   bzero((char*)&serverAddress, sizeof(serverAddress));
@@ -233,7 +236,9 @@ int main(int argc, char** argv)
 
   connectAndCheck(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
-  dprintf(sockfd, "ID=%d\n", id);
+  printf("Connected.\n");
+
+  dprintf(socketFileDescriptor, "ID=%d\n", id);
 
   // struct pollfd pollArr[1];
   // pollArr[0].fd = STDIN_FILENO;
@@ -266,7 +271,7 @@ int main(int argc, char** argv)
   //   }
   // }
 
-  mraa_aio_close(tempSensor);
-  mraa_gpio_close(button);
+  // mraa_aio_close(tempSensor);
+  // mraa_gpio_close(button);
   exit(0);
 }
