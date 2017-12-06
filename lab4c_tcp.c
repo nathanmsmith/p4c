@@ -34,6 +34,16 @@ int run_flag = 1;
 int socketFileDescriptor;
 
 /** System Calls **/
+ssize_t readAndCheck(int fd, void* buf, size_t count)
+{
+  ssize_t status = read(fd, buf, count);
+  if (status == -1) {
+    fprintf(stderr, "[Read Error] Error Number: %d\nMessage: %s\n", errno, strerror(errno));
+    exit(EXIT_CODE_ERROR);
+  }
+  return status;
+}
+
 int socketAndCheck(int socket_family, int socket_type, int protocol)
 {
   int status = socket(socket_family, socket_type, protocol);
@@ -243,8 +253,8 @@ int main(int argc, char** argv)
   dprintf(socketFileDescriptor, "ID=%d\n", id);
 
   struct pollfd pollArr[1];
-  pollArr[0].fd = STDIN_FILENO;
-  pollArr[0].events = POLLIN | POLLHUP | POLLERR;
+  pollArr[0].fd = socketFileDescriptor;
+  pollArr[0].events = POLLIN;
 
   while (run_flag) {
     if (!paused) {
@@ -264,8 +274,9 @@ int main(int argc, char** argv)
     pollAndCheck(pollArr, 1, 0);
     if ((pollArr[0].revents & POLLIN)) {
       char input[100];
-      scanf("%s", input);
-      processCommand(input);
+      int bytesRead = readAndCheck(socketFileDescriptor, input, 100);
+      printf("%s", input);
+      // processCommand(input);
     }
 
     if (!paused) {
