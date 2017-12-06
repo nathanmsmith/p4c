@@ -103,7 +103,7 @@ void shutdownProgram()
   char timeString[10];
   getCurrentTime(timeString);
 
-  printf("%s SHUTDOWN\n", timeString);
+  dprintf(socketFileDescriptor, "%s SHUTDOWN\n", timeString);
   if (logFile) {
     fprintf(logFile, "%s SHUTDOWN\n", timeString);
     fflush(logFile);
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
       char timeString[10];
       getCurrentTime(timeString);
 
-      printf("%s %.1f\n", timeString, convertedTemp);
+      dprintf(socketFileDescriptor, "%s %.1f\n", timeString, convertedTemp);
       if (logFile) {
         fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
         fflush(logFile);
