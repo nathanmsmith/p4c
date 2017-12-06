@@ -24,7 +24,7 @@ ID: 704787554
 
 #define SUCCESS 0
 #define INVALID_ARGUMENT 1
-#define OTHER_FAILURE 1
+#define OTHER_FAILURE 2
 
 const int B = 4275; // B value of the thermistor
 const int R0 = 100000; // R0 = 100k
@@ -48,8 +48,7 @@ ssize_t readAndCheck(int fd, void* buf, size_t count)
 {
   ssize_t status = read(fd, buf, count);
   if (status == -1) {
-    fprintf(stderr, "[Read Error] Error Number: %d\nMessage: %s\n", errno, strerror(errno));
-    exit(2);
+    exit(OTHER_FAILURE);
   }
   return status;
 }
@@ -58,8 +57,7 @@ int socketAndCheck(int socket_family, int socket_type, int protocol)
 {
   int status = socket(socket_family, socket_type, protocol);
   if (status == -1) {
-    fprintf(stderr, "[Socket Error] Error Number: %d Message: %s\n", errno, strerror(errno));
-    exit(2);
+    exit(OTHER_FAILURE);
   }
   return status;
 }
@@ -68,8 +66,7 @@ int connectAndCheck(int sockfd, const struct sockaddr* addr, socklen_t addrlen)
 {
   int status = connect(sockfd, addr, addrlen);
   if (status == -1) {
-    fprintf(stderr, "[Connect Error] Error Number: %d Message: %s\n", errno, strerror(errno));
-    exit(2);
+    exit(OTHER_FAILURE);
   }
   return status;
 }
@@ -78,8 +75,7 @@ int pollAndCheck(struct pollfd* fds, nfds_t nfds, int timeout)
 {
   int status = poll(fds, nfds, timeout);
   if (status == -1) {
-    fprintf(stderr, "[Poll Error] Error Number: %d\nMessage: %s\n", errno, strerror(errno));
-    exit(2);
+    exit(OTHER_FAILURE);
   }
   return status;
 }
@@ -108,19 +104,15 @@ double convertTemperature(int rawTemp, char scale)
 
 void startProgram()
 {
-  if (logFile) {
-    fprintf(logFile, "START\n");
-    fflush(logFile);
-  }
+  fprintf(logFile, "START\n");
+  fflush(logFile);
   paused = false;
 }
 
 void stopProgram()
 {
-  if (logFile) {
-    fprintf(logFile, "STOP\n");
-    fflush(logFile);
-  }
+  fprintf(logFile, "STOP\n");
+  fflush(logFile);
   paused = true;
 }
 
@@ -130,10 +122,8 @@ void shutdownProgram()
   getCurrentTime(timeString);
 
   dprintf(socketFileDescriptor, "%s SHUTDOWN\n", timeString);
-  if (logFile) {
-    fprintf(logFile, "%s SHUTDOWN\n", timeString);
-    fflush(logFile);
-  }
+  fprintf(logFile, "%s SHUTDOWN\n", timeString);
+  fflush(logFile);
 
   run_flag = 0;
 }
@@ -142,37 +132,29 @@ void changeScale(char newScale)
 {
   scale = newScale;
 
-  if (logFile) {
-
-    char command[10];
-    if (scale == 'C') {
-      strcpy(command, "SCALE=C");
-    } else {
-      strcpy(command, "SCALE=F");
-    }
-    fprintf(logFile, "%s\n", command);
-    fflush(logFile);
+  char command[10];
+  if (scale == 'C') {
+    strcpy(command, "SCALE=C");
+  } else {
+    strcpy(command, "SCALE=F");
   }
+  fprintf(logFile, "%s\n", command);
+  fflush(logFile);
 }
 
 void changePeriod(char* newPeriod)
 {
   samplingInterval = atoi(newPeriod);
 
-  if (logFile) {
-    char command[10] = "PERIOD=";
-    strcat(command, newPeriod);
-
-    fprintf(logFile, "%s\n", command);
-    fflush(logFile);
-  }
+  char command[10] = "PERIOD=";
+  strcat(command, newPeriod);
+  fprintf(logFile, "%s\n", command);
+  fflush(logFile);
 }
 
 void logLine(char* line)
 {
-  if (logFile) {
-    fprintf(logFile, line);
-  }
+  fprintf(logFile, line);
 }
 
 void processCommand(char* input)
@@ -182,10 +164,9 @@ void processCommand(char* input)
   } else if (strcmp(input, "START") == 0) {
     startProgram();
   } else if (strcmp(input, "OFF") == 0) {
-    if (logFile) {
-      fprintf(logFile, "OFF\n");
-      fflush(logFile);
-    }
+    fprintf(logFile, "OFF\n");
+    fflush(logFile);
+
     shutdownProgram();
   } else if (strcmp(input, "SCALE=F") == 0) {
     changeScale('F');
@@ -277,7 +258,10 @@ int main(int argc, char** argv)
 
   printf("Connected.\n");
 
+  // Send, log ID
   dprintf(socketFileDescriptor, "ID=%d\n", id);
+  fprintf(logFile, "ID=%d\n", id);
+  fflush(logFile);
 
   struct pollfd pollArr[1];
   pollArr[0].fd = socketFileDescriptor;
@@ -292,10 +276,8 @@ int main(int argc, char** argv)
       getCurrentTime(timeString);
 
       dprintf(socketFileDescriptor, "%s %.1f\n", timeString, convertedTemp);
-      if (logFile) {
-        fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
-        fflush(logFile);
-      }
+      fprintf(logFile, "%s %.1f\n", timeString, convertedTemp);
+      fflush(logFile);
     }
 
     pollAndCheck(pollArr, 1, 0);
