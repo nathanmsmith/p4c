@@ -5,7 +5,6 @@
 default: build
 
 build:
-	# gcc -lm -Wall -Wextra -o lab4c_tcp lab4c_tcp.c
 	gcc -lmraa -lm -Wall -Wextra -o lab4c_tcp lab4c_tcp.c
 	gcc -lssl -lcrypto -Wall -Wextra -o lab4c_tls lab4c_tls.c
 

@@ -22,12 +22,22 @@ ID: 704787554
 #include <time.h>
 #include <unistd.h>
 
+#define SUCCESS 0
+#define INVALID_ARGUMENT 1
+#define OTHER_FAILURE 1
+
 const int B = 4275; // B value of the thermistor
 const int R0 = 100000; // R0 = 100k
 
+// Use values to track whether variables were set or not
+int id = -1;
+char* hostname = ""; // Should be lever.cs.ucla.edu
+FILE* logFile = NULL;
+int portNumber = -1;
+
 int samplingInterval = 1;
 char scale = 'F';
-FILE* logFile;
+
 bool paused = false;
 int run_flag = 1;
 
@@ -199,10 +209,6 @@ int main(int argc, char** argv)
     { 0, 0, 0, 0 }
   };
 
-  int id;
-  char* hostname = "lever.cs.ucla.edu";
-  int portNumber;
-
   while (optind < argc) {
     int option;
     if ((option = getopt_long(argc, argv, "", options, 0)) != -1) {
@@ -212,7 +218,7 @@ int main(int argc, char** argv)
         break;
       case 's': // Scale
         if (strcmp(optarg, "F") != 0 && strcmp(optarg, "C") != 0) {
-          exit(1);
+          exit(INVALID_ARGUMENT);
         }
         scale = optarg[0];
         break;
@@ -221,15 +227,12 @@ int main(int argc, char** argv)
         break;
       case 'i': // Id
         id = atoi(optarg);
-        printf("ID: %d\n", id);
         break;
       case 'h': // Host
         hostname = optarg;
-        printf("Host: %s\n", hostname);
         break;
       default:
-        fprintf(stderr, "[Error] Unsupported argument.\n");
-        exit(0);
+        exit(INVALID_ARGUMENT);
       }
     } else {
       // Non-switch parameter, port number
@@ -239,15 +242,14 @@ int main(int argc, char** argv)
     }
   }
 
+  // Since --id, --host, --log, and port number are mandatory
+  if (id == -1 || strcmp(hostname, "") || logFile == NULL || portNumber == -1) {
+    exit(INVALID_ARGUMENT);
+  }
+
   // // Initialize Temperature Sensor
   mraa_aio_context tempSensor;
   tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
-
-  // // Initialize button
-  // mraa_gpio_context button;
-  // button = mraa_gpio_init(60); // Spec calls for D3 pin, unsure of where that is so this may change
-  // mraa_gpio_dir(button, MRAA_GPIO_IN);
-  // mraa_gpio_isr(button, MRAA_GPIO_EDGE_RISING, &shutdownProgram, NULL);
 
   // Establish connection
   struct sockaddr_in serverAddress;
@@ -300,8 +302,6 @@ int main(int argc, char** argv)
           start = i + 1;
         }
       }
-
-      // processCommand(input);
     }
 
     if (!paused) {
@@ -310,6 +310,5 @@ int main(int argc, char** argv)
   }
 
   mraa_aio_close(tempSensor);
-  // mraa_gpio_close(button);
-  exit(0);
+  exit(SUCCESS);
 }
