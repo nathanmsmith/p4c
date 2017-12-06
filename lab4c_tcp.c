@@ -238,6 +238,9 @@ int main(int argc, char** argv)
     }
   }
 
+  printf("%i\n", optind);
+  printf("%i\n", argc);
+
   portNumber = atoi(argv[optind]);
 
   // Since --id, --host, --log, and port number are mandatory
