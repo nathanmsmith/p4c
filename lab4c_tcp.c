@@ -240,7 +240,7 @@ int main(int argc, char** argv)
 
   if (optind != argc) {
     portNumber = atoi(argv[optind]);
-    printf("port num %i\n", portNumber)
+    printf("port num %i\n", portNumber);
   }
 
   // Since --id, --host, --log, and port number are mandatory
