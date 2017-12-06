@@ -98,15 +98,19 @@ double convertTemperature(int rawTemp, char scale)
 
 void startProgram()
 {
-  fprintf(logFile, "START\n");
-  fflush(logFile);
+  if (logFile) {
+    fprintf(logFile, "START\n");
+    fflush(logFile);
+  }
   paused = false;
 }
 
 void stopProgram()
 {
-  fprintf(logFile, "STOP\n");
-  fflush(logFile);
+  if (logFile) {
+    fprintf(logFile, "STOP\n");
+    fflush(logFile);
+  }
   paused = true;
 }
 
