@@ -30,10 +30,10 @@ const int B = 4275; // B value of the thermistor
 const int R0 = 100000; // R0 = 100k
 
 // Use values to track whether variables were set or not
-int id = -1;
+int id = 0;
 char* hostname = ""; // Should be lever.cs.ucla.edu
 FILE* logFile = NULL;
-int portNumber = -1;
+int portNumber = 0;
 
 int samplingInterval = 1;
 char scale = 'F';
@@ -223,6 +223,9 @@ int main(int argc, char** argv)
       break;
     case 'l': // Log
       logFile = fopen(optarg, "w");
+      if (!logFile) {
+        exit(OTHER_FAILURE);
+      }
       break;
     case 'i': // Id
       id = atoi(optarg);
@@ -235,10 +238,10 @@ int main(int argc, char** argv)
     }
   }
 
-  portNumber = argv[optind];
+  portNumber = atoi(argv[optind]);
 
   // Since --id, --host, --log, and port number are mandatory
-  if (id == -1 || strcmp(hostname, "") || logFile == NULL || portNumber == -1) {
+  if (id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0) {
     exit(INVALID_ARGUMENT);
   }
 
@@ -249,6 +252,9 @@ int main(int argc, char** argv)
   // Establish connection
   struct sockaddr_in serverAddress;
   struct hostent* server = gethostbyname(hostname);
+  if (server == NULL) {
+    printf("told ya so\n");
+  }
   socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
 
   bzero((char*)&serverAddress, sizeof(serverAddress));
