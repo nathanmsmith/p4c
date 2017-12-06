@@ -209,6 +209,7 @@ int main(int argc, char** argv)
     { 0, 0, 0, 0 }
   };
 
+  int option;
   while ((option = getopt_long(argc, argv, "", options, 0)) != -1) {
     switch (option) {
     case 'p': // Period
@@ -235,7 +236,7 @@ int main(int argc, char** argv)
   }
 
   for (index = optind; index < argc; index++) {
-    printf("Non-option argument: %s\n", argv[index])
+    printf("Non-option argument: %s\n", argv[index]);
   }
 
   // Since --id, --host, --log, and port number are mandatory
