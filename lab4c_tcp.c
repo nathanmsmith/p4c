@@ -31,6 +31,8 @@ FILE* logFile;
 bool paused = false;
 int run_flag = 1;
 
+int socketFileDescriptor;
+
 /** System Calls **/
 int socketAndCheck(int socket_family, int socket_type, int protocol)
 {
@@ -227,7 +229,7 @@ int main(int argc, char** argv)
   // Establish connection
   struct sockaddr_in serverAddress;
   struct hostent* server = gethostbyname(hostname);
-  int socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
+  socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
 
   bzero((char*)&serverAddress, sizeof(serverAddress));
   serverAddress.sin_family = AF_INET;
