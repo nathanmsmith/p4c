@@ -39,7 +39,7 @@ ssize_t readAndCheck(int fd, void* buf, size_t count)
   ssize_t status = read(fd, buf, count);
   if (status == -1) {
     fprintf(stderr, "[Read Error] Error Number: %d\nMessage: %s\n", errno, strerror(errno));
-    exit(EXIT_CODE_ERROR);
+    exit(2);
   }
   return status;
 }
