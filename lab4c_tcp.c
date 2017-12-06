@@ -221,18 +221,10 @@ int main(int argc, char** argv)
 
   if (optind != argc) {
     portNumber = atoi(argv[optind]);
-    printf("port num %i\n", portNumber);
   }
 
   // Since --id, --host, --log, and port number are mandatory
   if (id <= 0 || strcmp(hostname, "") == 0 || logFile == NULL || portNumber == 0) {
-    fprintf(stderr, "Argument error\n");
-    fprintf(stderr, "%i\n", id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0);
-    fprintf(stderr, "%i\n", id <= 0);
-    fprintf(stderr, "%i\n", strcmp(hostname, ""));
-    fprintf(stderr, "%i\n", logFile == NULL);
-    fprintf(stderr, "%i\n", portNumber == 0);
-    fprintf(stderr, "ID: %i\nhostname: %s\nportNumber: %i\n", id, hostname, portNumber);
     exit(INVALID_ARGUMENT);
   }
 
@@ -242,11 +234,7 @@ int main(int argc, char** argv)
 
   // Establish connection
   struct sockaddr_in serverAddress;
-  printf("Hostname: %s\n", hostname);
   struct hostent* server = gethostbyname(hostname);
-  if (server == NULL) {
-    printf("told ya so\n");
-  }
   socketFileDescriptor = socketAndCheck(AF_INET, SOCK_STREAM, 0);
 
   bzero((char*)&serverAddress, sizeof(serverAddress));
@@ -255,8 +243,6 @@ int main(int argc, char** argv)
   serverAddress.sin_port = htons(portNumber);
 
   connectAndCheck(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
-
-  printf("Connected.\n");
 
   // Send, log ID
   dprintf(socketFileDescriptor, "ID=%d\n", id);
@@ -284,7 +270,6 @@ int main(int argc, char** argv)
     if ((pollArr[0].revents & POLLIN)) {
       char input[100];
       int bytesRead = readAndCheck(socketFileDescriptor, input, 100);
-      printf("%s", input);
 
       int i;
       int start = 0;
