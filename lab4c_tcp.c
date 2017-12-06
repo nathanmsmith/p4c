@@ -238,10 +238,9 @@ int main(int argc, char** argv)
     }
   }
 
-  printf("%i\n", optind);
-  printf("%i\n", argc);
-
-  portNumber = atoi(argv[optind]);
+  if (optind != argc) {
+    portNumber = atoi(argv[optind]);
+  }
 
   // Since --id, --host, --log, and port number are mandatory
   if (id <= 0 || strcmp(hostname, "") || logFile == NULL || portNumber == 0) {
