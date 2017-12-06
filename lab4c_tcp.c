@@ -209,7 +209,8 @@ int main(int argc, char** argv)
     { 0, 0, 0, 0 }
   };
 
-  while ((int option = getopt_long(argc, argv, "", options, 0)) != -1) {
+  int option;
+  while ((option = getopt_long(argc, argv, "", options, 0)) != -1) {
     switch (option) {
     case 'p': // Period
       samplingInterval = atoi(optarg);
