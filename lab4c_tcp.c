@@ -8,7 +8,6 @@ ID: 704787554
 #include <getopt.h>
 #include <math.h>
 #include <mraa/aio.h>
-// #include <mraa/gpio.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <poll.h>
