@@ -10,7 +10,6 @@ ID: 704787554
 #include <mraa/aio.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <openssl/evp.h>
 #include <openssl/ssl.h>
 #include <poll.h>
 #include <signal.h>
@@ -265,13 +264,11 @@ int main(int argc, char** argv)
 
   // Set up TLS Session
   printf("1\n");
+  SSL_library_init();
+  SSL_load_error_strings();
   OpenSSL_add_all_algorithms();
   printf("2\n");
-  if (SSL_library_init() < 0) {
-    printf("well this is wrong\n");
-  }
-  printf("2\n");
-  const SSL_METHOD* method = TLSv1_2_client_method();
+  const SSL_METHOD* method = TLS_client_method();
   printf("3\n");
   SSL_CTX* sslContext = SSL_CTX_new(method);
   printf("4\n");
