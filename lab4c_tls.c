@@ -268,8 +268,8 @@ int main(int argc, char** argv)
   SSL_load_error_strings();
   OpenSSL_add_all_algorithms();
   printf("2\n");
-  const SSL_METHOD* method = TLSv1_client_method()
-      printf("3\n");
+  const SSL_METHOD* method = TLSv1_client_method();
+  printf("3\n");
   SSL_CTX* sslContext = SSL_CTX_new(method);
   printf("4\n");
   sslStructure = SSL_new(sslContext);
