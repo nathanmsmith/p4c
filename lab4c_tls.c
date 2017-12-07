@@ -10,6 +10,7 @@ ID: 704787554
 #include <mraa/aio.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <openssl/evp.h>
 #include <openssl/ssl.h>
 #include <poll.h>
 #include <signal.h>
