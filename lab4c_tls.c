@@ -186,6 +186,8 @@ void writeToServerOverSSL(char* str)
   if (SSL_write(sslStructure, str, strlen(str)) < 0) {
     exit(OTHER_FAILURE);
   }
+  fprintf(logFile, idString);
+  fflush(logFile);
 }
 
 int main(int argc, char** argv)
@@ -241,6 +243,8 @@ int main(int argc, char** argv)
     exit(INVALID_ARGUMENT);
   }
 
+  fprintf(logFile, "hello");
+
   // Initialize Temperature Sensor
   mraa_aio_context tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
 
@@ -256,6 +260,8 @@ int main(int argc, char** argv)
 
   connectAndCheck(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
+  fprintf(logFile, "hi");
+
   // Set up TLS Session
   SSL_library_init();
   OpenSSL_add_all_algorithms();
@@ -269,11 +275,13 @@ int main(int argc, char** argv)
     exit(OTHER_FAILURE);
   }
 
+  fprintf(logFile, "what's up");
+
   char idString[20];
   sprintf(idString, "ID=%d\n", id);
-  writeToServerOverSSL(idString);
-  fprintf(logFile, idString);
-  fflush(logFile);
+  writeToServerOverSSLAndLog(idString);
+
+  fprintf(logFile, "nm nm u?");
 
   struct pollfd pollArr[1];
   pollArr[0].fd = socketFileDescriptor;
@@ -289,9 +297,7 @@ int main(int argc, char** argv)
 
       char tempString[20];
       sprintf(tempString, "%s %.1f\n", timeString, convertedTemp);
-      writeToServerOverSSL(tempString);
-      fprintf(logFile, tempString);
-      fflush(logFile);
+      writeToServerOverSSLAndLog(tempString);
     }
 
     pollAndCheck(pollArr, 1, 0);
