@@ -186,7 +186,7 @@ void writeToServerOverSSLAndLog(char* str)
   if (SSL_write(sslStructure, str, strlen(str)) < 0) {
     exit(OTHER_FAILURE);
   }
-  fprintf(str, str);
+  fprintf(logFile, str);
   fflush(logFile);
 }
 
