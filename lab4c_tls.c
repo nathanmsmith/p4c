@@ -243,7 +243,7 @@ int main(int argc, char** argv)
     exit(INVALID_ARGUMENT);
   }
 
-  fprintf(logFile, "hello");
+  fprintf(logFile, "hello\n");
 
   // Initialize Temperature Sensor
   mraa_aio_context tempSensor = mraa_aio_init(1); // AIN0 mapped to MRAA pin 1
@@ -260,11 +260,13 @@ int main(int argc, char** argv)
 
   connectAndCheck(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
-  fprintf(logFile, "hi");
+  fprintf(logFile, "hi\n");
 
   // Set up TLS Session
   OpenSSL_add_all_algorithms();
-  SSL_library_init();
+  if (SSL_library_init() < 0) {
+    printf("well this is wrong\n");
+  }
   const SSL_METHOD* method = TLSv1_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
   sslStructure = SSL_new(sslContext);
