@@ -263,8 +263,8 @@ int main(int argc, char** argv)
   fprintf(logFile, "hi");
 
   // Set up TLS Session
-  SSL_library_init();
   OpenSSL_add_all_algorithms();
+  SSL_library_init();
   const SSL_METHOD* method = TLSv1_client_method();
   SSL_CTX* sslContext = SSL_CTX_new(method);
   sslStructure = SSL_new(sslContext);
