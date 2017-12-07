@@ -181,12 +181,12 @@ void processCommand(char* input)
   }
 }
 
-void writeToServerOverSSL(char* str)
+void writeToServerOverSSLAndLog(char* str)
 {
   if (SSL_write(sslStructure, str, strlen(str)) < 0) {
     exit(OTHER_FAILURE);
   }
-  fprintf(logFile, idString);
+  fprintf(str, str);
   fflush(logFile);
 }
 
