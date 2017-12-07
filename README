@@ -3,9 +3,12 @@ EMAIL: nathan.smith@ucla.edu
 ID: 704787554
 
 Files:
-- lab4c_tcp.c:
-- lab4c_tls: 
+- lab4c_tcp.c: A C source file that compiles to a program that implements part 1 of this lab: connected to a server over TCP and reading/writing data.
+- lab4c_tls: A C source file that compiles to a program that implements part 12of this lab: connected to a server over SSL/TLS and reading/writing data.
 - Makefile: a Makefile with the commands defined by the spec.
 - README: This README!
 
 Notes:
+- I found that only the function TLSv1_client_method() allowed me to connect to the server via TLS, so I went with that.
+- The spec did not specify anything about error messages, so I did not include any.
+- I had to run `sudo apt-get install libssl-dev` to get the programs to compile on my beaglebone.
