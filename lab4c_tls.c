@@ -263,21 +263,15 @@ int main(int argc, char** argv)
   fprintf(logFile, "hi\n");
 
   // Set up TLS Session
-  printf("1\n");
   SSL_library_init();
   SSL_load_error_strings();
   OpenSSL_add_all_algorithms();
-  printf("2\n");
   const SSL_METHOD* method = TLSv1_client_method();
-  printf("3\n");
   SSL_CTX* sslContext = SSL_CTX_new(method);
-  printf("4\n");
   sslStructure = SSL_new(sslContext);
-  printf("5\n");
   if (SSL_set_fd(sslStructure, socketFileDescriptor) < 0) {
     exit(OTHER_FAILURE);
   }
-  printf("6\n");
   if (SSL_connect(sslStructure) < 0) {
     exit(OTHER_FAILURE);
   }
